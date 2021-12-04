@@ -11,18 +11,11 @@ typedef struct service_user
 
 int main(int argc, char **argv)
 {
-	// TODO: right types?
 	size_t size = 0;
-	char **av;
+	char **av; 
 	char *user_args;
 	char *to;
 	char *from;
-
-	// TODO: this should allocated on the heap behind user_args
-	// check on GDB where it is currently
-	// and *somehow* get it in the right place
-	service_user *user = malloc(sizeof(service_user));
-	strcpy(user->name, "unprivileged");
 
 	// allocate destination
 	for (size = 0, av = argv + 1; *av; av++)
@@ -32,6 +25,10 @@ int main(int argc, char **argv)
 		printf("Invalid size or malloc\n");
 		exit(1);
 	}
+
+	// allocated on the heap somewhere behind user_args
+	service_user *user = malloc(sizeof(service_user));
+	strcpy(user->name, "unprivileged");
 
 	// unescape vulnerability
 	for (to = user_args, av = argv + 1; (from = *av); av++)
