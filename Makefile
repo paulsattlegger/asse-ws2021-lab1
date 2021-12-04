@@ -128,9 +128,8 @@ exploit_heapcorruption-entry: vuln_heapcorruption-entry
 exploit_heapcorruption-medium: vuln_heapcorruption-medium
 	@echo 'NOT IMPLEMENTED'
 
-exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py libnss_exploit.c vuln_heapcorruption-advanced
-	$(GCC) $(CFLAGS) -c libnss_exploit.c
-	$(GCC) $(CFLAGS) -shared -o libnss_exploit.so.2 libnss_exploit.o
+exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py libnss_exploit/libnss_exploit.c vuln_heapcorruption-advanced
+	$(GCC) $(CFLAGS) -shared -o libnss_exploit/libnss_exploit.so.2 libnss_exploit/libnss_exploit.c
 	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; ./exploit_heapcorruption-advanced.py'
 
 exploit_heapcorruption-elite: vuln_heapcorruption-elite

@@ -48,7 +48,6 @@ typedef struct service_user
 static const char *const __nss_shlib_revision = LIBNSS_FILES_SO + 15;
 
 // https://code.woboq.org/userspace/glibc/nss/nsswitch.c.html
-// TODO: __libc_dlopen("./libnss_exploit.so.2") must be executed
 static int
 nss_load_library(service_user *ni)
 {
@@ -64,6 +63,7 @@ nss_load_library(service_user *ni)
 								   ni->name),
 						  ".so"),
 				 __nss_shlib_revision);
+		// TODO: char *shlib_name = "libnss_exploit/libnss_exploit.so.2";
 		ni->library->lib_handle = __libc_dlopen(shlib_name);
 	}
 	return 0;
