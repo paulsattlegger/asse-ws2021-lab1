@@ -11,7 +11,6 @@
 # Each implemented target must remove the 'NOT IMPLEMENTED' output, and produce
 # an executable that has the same name as the target identifier.
 
-
 GCC=/usr/bin/gcc
 
 LEVEL_ENTRY = -fno-stack-protector -D_FORTIFY_SOURCE=0 -Wl,-z,norelro,-z,execstack -no-pie
@@ -23,8 +22,8 @@ CLANG=/usr/bin/clang
 LEVEL_ELITE = -fstack-protector-all -D_FORTIFY_SOURCE=2 -z relro -z now -fpie -pie -flto -fsanitize=cfi -fsanitize=safe-stack -fuse-ld=gold
 
 
-CFLAGS = -m32 -g  -O0
-CFLAGS64 = -m64 -g -O0 -static
+CFLAGS = -m32 -g -O0 -ldl
+CFLAGS64 = -m64 -g -O0 -static -ldl
 
 
 # As an example, we have implemented the following target
@@ -129,9 +128,10 @@ exploit_heapcorruption-entry: vuln_heapcorruption-entry
 exploit_heapcorruption-medium: vuln_heapcorruption-medium
 	@echo 'NOT IMPLEMENTED'
 
-exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py vuln_heapcorruption-advanced
-	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; \
-	./exploit_heapcorruption-advanced.py'
+exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py libnss_exploit.c vuln_heapcorruption-advanced
+	$(GCC) $(CFLAGS) -c libnss_exploit.c
+	$(GCC) $(CFLAGS) -shared -o libnss_exploit.so.2 libnss_exploit.o
+	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; ./exploit_heapcorruption-advanced.py'
 
 exploit_heapcorruption-elite: vuln_heapcorruption-elite
 	@echo 'NOT IMPLEMENTED'
