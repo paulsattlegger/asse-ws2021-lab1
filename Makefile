@@ -74,11 +74,11 @@ vuln_formatstring-elite:
 vuln_heapcorruption-entry:
 	@echo 'NOT IMPLEMENTED'
 
-vuln_heapcorruption-medium: vuln_heapcorruption-medium.c
-	$(GCC) $(CFLAGS) $(LEVEL_MEDIUM) -o $@ $<
-
-vuln_heapcorruption-advanced:
+vuln_heapcorruption-medium:
 	@echo 'NOT IMPLEMENTED'
+
+vuln_heapcorruption-advanced: vuln_heapcorruption-advanced.c
+	$(GCC) $(CFLAGS) $(LEVEL_ADVANCED) -o $@ $<
 
 vuln_heapcorruption-elite:
 	@echo 'NOT IMPLEMENTED'
@@ -126,12 +126,12 @@ exploit_formatstring-elite: vuln_formatstring-elite
 exploit_heapcorruption-entry: vuln_heapcorruption-entry
 	@echo 'NOT IMPLEMENTED'
 
-exploit_heapcorruption-medium: exploit_heapcorruption-medium.py vuln_heapcorruption-medium
-	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; \
-	./exploit_heapcorruption-medium.py'
-
-exploit_heapcorruption-advanced: vuln_heapcorruption-advanced
+exploit_heapcorruption-medium: vuln_heapcorruption-medium
 	@echo 'NOT IMPLEMENTED'
+
+exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py vuln_heapcorruption-advanced
+	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; \
+	./exploit_heapcorruption-advanced.py'
 
 exploit_heapcorruption-elite: vuln_heapcorruption-elite
 	@echo 'NOT IMPLEMENTED'
