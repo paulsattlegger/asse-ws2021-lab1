@@ -3,13 +3,6 @@
 ##
 # The submission archive will be extracted in /home/unprivileged and make will
 # be invoked with these targets as user 'unprivileged' from this directory.
-##
-# Targets for vulnerable programs in the category A 'Stack Based Buffer Overflow'
-#
-# You need to implement at most one target per category
-#
-# Each implemented target must remove the 'NOT IMPLEMENTED' output, and produce
-# an executable that has the same name as the target identifier.
 
 GCC=/usr/bin/gcc
 
@@ -25,6 +18,15 @@ LEVEL_ELITE = -fstack-protector-all -D_FORTIFY_SOURCE=2 -z relro -z now -fpie -p
 CFLAGS = -m32 -g -O0 -ldl
 CFLAGS64 = -m64 -g -O0 -static -ldl
 
+.DEFAULT_GOAL := debug
+
+##
+# Targets for vulnerable programs in the category A 'Stack Based Buffer Overflow'
+#
+# You need to implement at most one target per category
+#
+# Each implemented target must remove the 'NOT IMPLEMENTED' output, and produce
+# an executable that has the same name as the target identifier.
 
 # As an example, we have implemented the following target
 vuln_stackoverflow-entry:
@@ -76,8 +78,9 @@ vuln_heapcorruption-entry:
 vuln_heapcorruption-medium:
 	@echo 'NOT IMPLEMENTED'
 
+# TODO: change back to ADVANCED
 vuln_heapcorruption-advanced: vuln_heapcorruption-advanced.c
-	$(GCC) $(CFLAGS) $(LEVEL_ADVANCED) -o $@ $<
+	$(GCC) $(CFLAGS) $(LEVEL_MEDIUM) -o $@ $<
 
 vuln_heapcorruption-elite:
 	@echo 'NOT IMPLEMENTED'
@@ -128,10 +131,20 @@ exploit_heapcorruption-entry: vuln_heapcorruption-entry
 exploit_heapcorruption-medium: vuln_heapcorruption-medium
 	@echo 'NOT IMPLEMENTED'
 
-exploit_heapcorruption-advanced: exploit_heapcorruption-advanced.py libnss_exploit/libnss_exploit.c vuln_heapcorruption-advanced
-	$(GCC) $(CFLAGS) -shared -o libnss_exploit/libnss_exploit.so.2 libnss_exploit/libnss_exploit.c
+exploit_heapcorruption-advanced: evil_library exploit_heapcorruption-advanced.py vuln_heapcorruption-advanced
 	/bin/bash -c 'source /home/vagrant/python-venv/pwn3/bin/activate; ./exploit_heapcorruption-advanced.py'
 
 exploit_heapcorruption-elite: vuln_heapcorruption-elite
 	@echo 'NOT IMPLEMENTED'
 
+# Miscellaneous
+# TODO: delete?
+
+debug: clean evil_library vuln_heapcorruption-advanced 
+
+evil_library: libnss_X/X.c
+	$(GCC) $(CFLAGS) -shared -o libnss_X/X.so.2 libnss_X/X.c
+
+clean:
+	$(RM) vuln_heapcorruption-advanced
+	$(RM) libnss_X/X.so.2
