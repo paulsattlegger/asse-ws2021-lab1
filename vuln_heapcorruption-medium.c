@@ -3,6 +3,12 @@
 #include <stdio.h>
 #include <ctype.h>
 
+typedef struct service_user
+{
+  /* ... */
+  char name[32];
+} service_user;
+
 int main(int argc, char **argv)
 {
 	// TODO: right types?
@@ -11,6 +17,12 @@ int main(int argc, char **argv)
 	char *user_args;
 	char *to;
 	char *from;
+
+	// TODO: this should allocated on the heap behind user_args
+	// check on GDB where it is currently
+	// and *somehow* get it in the right place
+	service_user *user = malloc(sizeof(service_user));
+	strcpy(user->name, "unprivileged");
 
 	// allocate destination
 	for (size = 0, av = argv + 1; *av; av++)
@@ -33,7 +45,14 @@ int main(int argc, char **argv)
 		*to++ = ' ';
 	}
 
-	printf("Done\n");
+	// in the original exploit, a shared library would be loaded with
+	// the name libnss_{user->name}.so.2
+	if (strcmp(user->name, "root") == 0) {
+		printf("root access");
+	} else {
+		printf("unprivileged access");
+	}
+	printf("\n");
 
-	exit(2);
+	exit(EXIT_SUCCESS);
 }
