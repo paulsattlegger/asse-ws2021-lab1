@@ -51,9 +51,8 @@ static const char *const __nss_shlib_revision = LIBNSS_FILES_SO + 15;
 static int
 nss_load_library(service_user *ni)
 {
-	// TODO: uncomment
-	//if (ni->library->lib_handle == NULL)
-	//{
+	if (ni->library->lib_handle == NULL)
+	{
 		/* Load the shared library.  */
 		size_t shlen = (7 + strlen(ni->name) + 3 + strlen(__nss_shlib_revision) + 1);
 		int saved_errno = errno;
@@ -66,7 +65,7 @@ nss_load_library(service_user *ni)
 				 __nss_shlib_revision);
 		// TODO: buffer overflow needs to have this effect: strcpy(shlib_name, "libnss_X/X.so.2");
 		ni->library->lib_handle = __libc_dlopen(shlib_name);
-	//}
+	}
 	return 0;
 }
 
@@ -87,7 +86,7 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	// allocated on the heap somewhere behind user_args
+	// allocate on the heap behind user_args
 	service_user *ni = malloc(sizeof(service_user));
 	ni->library = malloc(sizeof(service_library));
 
@@ -104,7 +103,10 @@ int main(int argc, char **argv)
 		*to++ = ' ';
 	}
 
-	// call nss_load_libary somewhere behind heap buffer overflow
+	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);
+
+	if (dlerror() != 0) 
+		exit(EXIT_FAILURE);
 	exit(EXIT_SUCCESS);
 }
