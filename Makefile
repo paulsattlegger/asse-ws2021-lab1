@@ -147,7 +147,12 @@ clean:
 	$(RM) libnss_X/X.so.2
 
 submission_files = Makefile vuln_heapcorruption-advanced.c libnss_X/X.c exploit_heapcorruption-advanced.py  
-submission_file = lab1_03.tgz
+team_number = 03
+submission_file = lab1_$(team_number).tgz
 
 submission: $(submission_files)
 	tar -cvzf $(submission_file) $(submission_files)
+
+test-submission: submission
+	mv $(submission_file) ~/submission/$(team_number)
+	~/test-submission.sh $(team_number)
