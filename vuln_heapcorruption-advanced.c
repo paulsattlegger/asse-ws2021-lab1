@@ -74,7 +74,7 @@ nss_load_library(service_user *ni)
 	}
 }
 
-int main(int argc, char **argv)
+void main(int argc, char **argv)
 {
 	char *user_args;
 	service_user *ni;
