@@ -6,6 +6,7 @@
 #include <dlfcn.h>
 
 #define __libc_dlopen(name) dlopen(name, RTLD_NOW)
+#define __set_errno(val) (errno = (val))
 
 // https://code.woboq.org/userspace/glibc/nss/nsswitch.h.html
 typedef enum
@@ -63,10 +64,14 @@ nss_load_library(service_user *ni)
 								   ni->name),
 						  ".so"),
 				 __nss_shlib_revision);
-		// TODO: buffer overflow needs to have this effect: strcpy(shlib_name, "libnss_X/X.so.2");
 		ni->library->lib_handle = __libc_dlopen(shlib_name);
+		if (ni->library->lib_handle == NULL)
+		{
+			/* Failed to load the library.  */
+			ni->library->lib_handle = (void *)-1l;
+			__set_errno(saved_errno);
+		}
 	}
-	return 0;
 }
 
 int main(int argc, char **argv)
@@ -84,9 +89,8 @@ int main(int argc, char **argv)
 		/* Alloc and build up user_args. */
 		for (size = 0, av = argv + 1; *av; av++)
 			size += strlen(*av) + 1;
-		if (size == 0 || (user_args = malloc(size)) == NULL) {
+		if (size == 0 || (user_args = malloc(size)) == NULL)
 			exit(EXIT_FAILURE);
-		};
 
 		// allocation here added by us
 		// allocate service_user behind user args
@@ -114,8 +118,5 @@ int main(int argc, char **argv)
 
 	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);
-
-	if (dlerror() != 0)
-		exit(EXIT_FAILURE);
-	exit(EXIT_SUCCESS);
+	exit(errno);
 }

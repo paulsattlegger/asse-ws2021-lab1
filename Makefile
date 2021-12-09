@@ -18,8 +18,6 @@ LEVEL_ELITE = -fstack-protector-all -D_FORTIFY_SOURCE=2 -z relro -z now -fpie -p
 CFLAGS = -m32 -g -O0 -ldl
 CFLAGS64 = -m64 -g -O0 -static -ldl
 
-.DEFAULT_GOAL := debug
-
 ##
 # Targets for vulnerable programs in the category A 'Stack Based Buffer Overflow'
 #
@@ -137,7 +135,9 @@ exploit_heapcorruption-elite: vuln_heapcorruption-elite
 	@echo 'NOT IMPLEMENTED'
 
 # Miscellaneous
-debug: clean evil_library vuln_heapcorruption-advanced 
+.DEFAULT_GOAL := debug
+
+debug: clean evil_library vuln_heapcorruption-advanced
 
 evil_library: libnss_X/X.c
 	$(GCC) $(CFLAGS) -shared -o libnss_X/X.so.2 libnss_X/X.c
@@ -145,3 +145,9 @@ evil_library: libnss_X/X.c
 clean:
 	$(RM) vuln_heapcorruption-advanced
 	$(RM) libnss_X/X.so.2
+
+submission_files = Makefile vuln_heapcorruption-advanced.c libnss_X/X.c exploit_heapcorruption-advanced.py  
+submission_file = lab1_03.tgz
+
+submission: $(submission_files)
+	tar -cvzf $(submission_file) $(submission_files)
