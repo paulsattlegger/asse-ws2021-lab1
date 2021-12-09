@@ -14,11 +14,8 @@ void constructor()
     printf("Create file %s: ", filepath);
     if (open(filepath, O_CREAT | O_EXCL) == -1)
     {
-        if (errno != EEXIST)
-        {
-            printf("%m\n");
-            exit(errno);
-        }
+        printf("%m\n");
+    } else {
+        printf("Success\n");
     }
-    printf("Success\n");
 }

@@ -77,10 +77,9 @@ vuln_heapcorruption-entry:
 
 vuln_heapcorruption-medium:
 	@echo 'NOT IMPLEMENTED'
-
-# TODO: change back to ADVANCED
+	
 vuln_heapcorruption-advanced: vuln_heapcorruption-advanced.c
-	$(GCC) $(CFLAGS) $(LEVEL_MEDIUM) -o $@ $<
+	$(GCC) $(CFLAGS) $(LEVEL_ADVANCED) -o $@ $<
 
 vuln_heapcorruption-elite:
 	@echo 'NOT IMPLEMENTED'
@@ -138,8 +137,6 @@ exploit_heapcorruption-elite: vuln_heapcorruption-elite
 	@echo 'NOT IMPLEMENTED'
 
 # Miscellaneous
-# TODO: delete?
-
 debug: clean evil_library vuln_heapcorruption-advanced 
 
 evil_library: libnss_X/X.c
