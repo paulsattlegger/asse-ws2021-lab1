@@ -88,10 +88,11 @@ int main(int argc, char **argv)
 			exit(EXIT_FAILURE);
 		};
 
+		// allocation here added by us
 		// allocate service_user behind user args
 		ni = malloc(sizeof(service_user));
 		ni->library = malloc(sizeof(service_library));
-		
+
 		/*
 		 * When running a command via a shell, the sudo front-end
 		 * escapes potential meta chars.  We unescape non-spaces
@@ -110,14 +111,6 @@ int main(int argc, char **argv)
 		}
 		*--to = '\0';
 	}
-
-	// TODO: buffer overflow needs to fix the following addresses:
-	// int *first_size = (void *)0x5655a1bc;
-	// int *second_size = (void *)0x5655a1ec;
-	// char *name = (void *)0x5655a1f0; // this is 0x5655a1e0 when started via GDB
-	// *first_size = 0x00000031;
-	// *second_size = 0x00000011;
-	// strcpy(name, "X/X");
 
 	// call nss_load_libary behind heap buffer overflow
 	nss_load_library(ni);
